@@ -42,7 +42,7 @@ impl CodeWriter {
                     "-"
                 };
                 let assembly_code =
-                    format!("@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nM=M{selected_op}D\n@SP\nM=M+1");
+                    format!("@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nM=D{selected_op}M\n@SP\nM=M+1");
                 return assembly_code;
             }
             Operation::Neg | Operation::Not => {
