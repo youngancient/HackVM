@@ -24,7 +24,7 @@ fn main() {
     }
     for arg in args.iter().skip(1) {
         let file_name = extract_file_name(&arg);
-        println!("Assembling file : {}.asm",file_name);
+        println!("Assembling file : {}.vm",file_name);
         let result = translate(&arg);
         match result {
             Ok(_) => println!("Assembling successful ✅ Check output/{}.asm",file_name),

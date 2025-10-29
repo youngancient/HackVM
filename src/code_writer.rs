@@ -115,7 +115,7 @@ impl CodeWriter {
                 Segment::Static => {
                     let assembly_code = format!(
                         "@{file_name}.{index}\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1",
-                        file_name = self.file_name
+                        file_name = self.file_name.to_lowercase()
                     );
                     return assembly_code;
                 }
@@ -150,7 +150,7 @@ impl CodeWriter {
                     Segment::Static => {
                         let assembly_code = format!(
                             "@SP\nM=M-1\n@SP\nA=M\nD=M\n@{file_name}.{index}\nM=D",
-                            file_name = self.file_name
+                            file_name = self.file_name.to_lowercase()
                         );
                         return assembly_code;
                     }
