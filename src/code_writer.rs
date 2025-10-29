@@ -16,7 +16,7 @@ pub struct CodeWriter {
 impl CodeWriter {
     pub fn new(file_name: &str) -> Self {
         CodeWriter {
-            file_name : file_name.to_string(),
+            file_name: file_name.to_string(),
             jump_label_id: 0,
         }
     }
@@ -41,18 +41,8 @@ impl CodeWriter {
                 } else {
                     "-"
                 };
-                let assembly_code = format!(
-                    "@SP\n
-M=M-1\n
-A=M\n
-D=M\n
-@SP\n
-M=M-1\n
-A=M\n
-M=M{selected_op}D\n
-@SP\n
-M=M+1"
-                );
+                let assembly_code =
+                    format!("@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nM=M{selected_op}D\n@SP\nM=M+1");
                 return assembly_code;
             }
             Operation::Neg | Operation::Not => {
@@ -61,12 +51,7 @@ M=M+1"
                 } else {
                     "!"
                 };
-                let assembly_code = format!(
-                    "@SP\n
-                    A=M\n
-                    A=A-1\n
-                    M={selected_operation}M"
-                );
+                let assembly_code = format!("@SP\nA=M\nA=A-1\nM={selected_operation}M");
                 return assembly_code;
             }
             Operation::And | Operation::Or => {
@@ -76,16 +61,7 @@ M=M+1"
                     "|"
                 };
                 let assembly_code = format!(
-                    "@SP\n
-M=M-1\n
-A=M\n
-D=M\n
-@SP\n
-M=M-1\n
-A=M\n
-M=D{selected_operation}M\n
-@SP\n
-M=M+1"
+                    "@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nM=D{selected_operation}M\n@SP\nM=M+1"
                 );
                 return assembly_code;
             }
@@ -109,28 +85,7 @@ M=M+1"
 
                 self.jump_label_id += 1;
                 let assembly_code = format!(
-                    "@SP\n
-M=M-1\n
-A=M\n
-D=M\n
-@SP\n
-M=M-1\n
-A=M\n
-D=M-D\n
-@{true_jump_label}\n
-D;{operation_jmp_directive}\n
-@SP\n
-A=M\n
-M=0\n
-@{end_jump_label}\n
-0;JMP\n
-({true_jump_label})\n
-@SP\n
-A=M\n
-M=-1\n
-({end_jump_label})\n
-@SP\n
-M=M+1"
+                    "@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nD=M-D\n@{true_jump_label}\nD;{operation_jmp_directive}\n@SP\nA=M\nM=0\n@{end_jump_label}\n0;JMP\n({true_jump_label})\n@SP\nA=M\nM=-1\n({end_jump_label})\n@SP\nM=M+1"
                 );
                 return assembly_code;
             }
@@ -152,26 +107,14 @@ M=M+1"
                         base = 5;
                     }
                     let assembly_code = format!(
-                        "@{index_loc}\n
-D=A\n
-@SP\n
-A=M\n
-M=D\n
-@SP\n
-M=M+1",
+                        "@{index_loc}\nD=A\n@SP\nA=M\nM=D\n@SP\nM=M+1",
                         index_loc = index + base
                     );
                     return assembly_code;
                 }
                 Segment::Static => {
                     let assembly_code = format!(
-                        "@{file_name}.{index}\n
-D=M\n
-@SP\n
-A=M\n
-M=D\n
-@SP\n
-M=M+1",
+                        "@{file_name}.{index}\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1",
                         file_name = self.file_name
                     );
                     return assembly_code;
@@ -181,29 +124,12 @@ M=M+1",
                         panic!("Pointer parameter can only be 0 or 1");
                     }
                     let this_or_that = if index == 0 { "THIS" } else { "THAT" };
-                    let assembly_code = format!(
-                        "@{this_or_that}\n
-D=M\n
-@SP\n
-A=M\n
-M=D\n
-@SP\n
-M=M+1"
-                    );
+                    let assembly_code = format!("@{this_or_that}\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1");
                     return assembly_code;
                 }
                 _ => {
                     let assembly_code = format!(
-                        "@{register}\n
-D=M\n
-@{index}\n
-A=D+A\n
-D=M\n
-@SP\n
-A=M\n
-M=D\n
-@SP\n
-M=M+1",
+                        "@{register}\nD=M\n@{index}\nA=D+A\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1",
                         register = segment.asm_rep(),
                     );
                     return assembly_code;
@@ -216,26 +142,14 @@ M=M+1",
                     Segment::Temp => {
                         let temp_base = 5;
                         let assembly_code = format!(
-                            "@SP\n
-M=M-1\n
-@SP\n
-A=M\n
-D=M\n
-@{index_loc}\n
-M=D",
+                            "@SP\nM=M-1\n@SP\nA=M\nD=M\n@{index_loc}\nM=D",
                             index_loc = index + temp_base
                         );
                         return assembly_code;
                     }
                     Segment::Static => {
                         let assembly_code = format!(
-                            "@SP\n
-M=M-1\n
-@SP\n
-A=M\n
-D=M\n
-@{file_name}.{index}\n
-M=D",
+                            "@SP\nM=M-1\n@SP\nA=M\nD=M\n@{file_name}.{index}\nM=D",
                             file_name = self.file_name
                         );
                         return assembly_code;
@@ -245,32 +159,13 @@ M=D",
                             panic!("Pointer parameter can only be 0 or 1");
                         }
                         let this_or_that = if index == 0 { "THIS" } else { "THAT" };
-                        let assembly_code = format!(
-                            "@SP\n
-M=M-1\n
-@SP\n
-A=M\n
-D=M\n
-@{this_or_that}\n
-M=D"
-                        );
+                        let assembly_code =
+                            format!("@SP\nM=M-1\n@SP\nA=M\nD=M\n@{this_or_that}\nM=D");
                         return assembly_code;
                     }
                     _ => {
                         let assembly_code = format!(
-                            "@{index}\n
-D=A\n
-@{register}\n
-D=D+M\n
-@R13\n
-M=D\n
-@SP\n
-M=M-1\n
-A=M\n
-D=M\n
-@R13\n
-A=M\n
-M=D",
+                            "@{index}\nD=A\n@{register}\nD=D+M\n@R13\nM=D\n@SP\nM=M-1\nA=M\nD=M\n@R13\nA=M\nM=D",
                             register = segment.asm_rep()
                         );
                         return assembly_code;
