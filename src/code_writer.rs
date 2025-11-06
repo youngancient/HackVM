@@ -14,12 +14,21 @@ pub struct CodeWriter {
 }
 
 impl CodeWriter {
-    pub fn new(file_name: &str) -> Self {
+    pub fn new() -> Self {
         CodeWriter {
-            file_name: file_name.to_string(),
+            file_name: String::new(),
             jump_label_id: 0,
         }
     }
+
+    pub fn set_file_name(&mut self, file_name: &str) {
+        self.file_name = file_name.to_string();
+    }
+
+    pub fn write_init() -> String{
+        todo!()
+    }
+
     pub fn command_to_assembly(&mut self, command: CommandType) -> String {
         match command {
             CommandType::Arithmetic { operation } => self.write_arithmetic(operation),
@@ -174,6 +183,30 @@ impl CodeWriter {
             }
         }
     }
+
+    pub fn write_label() -> String {
+        todo!()
+    }
+
+    pub fn write_goto() -> String {
+        todo!()
+    }
+
+    pub fn write_if() -> String {
+        todo!()
+    }
+
+    pub fn write_function() -> String {
+        todo!()
+    }
+
+    pub fn write_call() -> String {
+        todo!()
+    }
+
+    pub fn write_return() -> String {
+        todo!()
+    }
 }
 
 #[cfg(test)]
@@ -197,7 +230,8 @@ M=M+1"#
             segment: Segment::Local,
             index: 2,
         };
-        let mut coder = CodeWriter::new("basictest");
+        let mut coder = CodeWriter::new();
+        coder.set_file_name("basictest");
         assert_eq!(result, coder.command_to_assembly(command))
     }
 
@@ -218,7 +252,8 @@ M=M+1"#
             segment: Segment::Argument,
             index: 3,
         };
-        let mut coder = CodeWriter::new("basictest");
+        let mut coder = CodeWriter::new();
+        coder.set_file_name("basictest");
         assert_eq!(result, coder.command_to_assembly(command))
     }
 }
