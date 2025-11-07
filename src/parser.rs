@@ -145,6 +145,10 @@ pub fn parse(instruction: String) -> CommandType {
             return CommandType::Label {
                 name: elements[1].to_string(),
             };
+        } else if elements[0] == "if-goto" {
+            return CommandType::If {
+                label: elements[1].to_string(),
+            };
         } else if elements[0] == "function" {
             if let Ok(val) = elements[2].parse::<u32>() {
                 return CommandType::Function {
