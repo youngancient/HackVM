@@ -31,7 +31,7 @@ impl CodeWriter {
         assembly_code.push_str("@256\n");
         assembly_code.push_str("D=A\n");
         assembly_code.push_str("@SP\n");
-        assembly_code.push_str("@M=D\n"); // SP = 256
+        assembly_code.push_str("M=D\n"); // SP = 256
         // call sys.init
         let init_label_id = self.jump_label_id;
         let init_return_label = format!("Sys.init$ret.{}", init_label_id);

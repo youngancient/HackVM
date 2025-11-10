@@ -1,7 +1,7 @@
 // bring it together here
 
 use std::{
-    fs::{self, File, create_dir, create_dir_all},
+    fs::{self, File, create_dir_all},
     io::{self, BufRead, Write},
     path::{Path, PathBuf},
 };

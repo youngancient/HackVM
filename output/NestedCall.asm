@@ -2,7 +2,7 @@
 @256
 D=A
 @SP
-@M=D
+M=D
 // call Sys.init$ret.0
 @Sys.init$ret.0
 D=A
