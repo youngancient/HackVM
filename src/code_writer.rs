@@ -263,7 +263,7 @@ impl CodeWriter {
     // jump to the function: goto function_label
     pub fn write_call(&mut self, function_name: &str, no_of_args: u32) -> String {
         // generate a unique return label
-        let return_label = format!("{}$ret.{}", function_name, no_of_args);
+        let return_label = format!("{}$ret.{}", function_name, self.jump_label_id);
         self.jump_label_id += 1;
 
         let mut assembly_code = String::new();
