@@ -44,7 +44,7 @@ impl CodeWriter {
 
         // Push 0 for LCL, ARG, THIS, THAT
         for _ in 0..4 {
-            assembly_code.push_str(&format!("@0\nD=A\n@SP\nA=M\nM=D\n@SP\nM=M+1"));
+            assembly_code.push_str(&format!("@0\nD=A\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"));
         }
 
         // ARG = SP - nArgs - 5 (ARG = SP - 0 - 5)
@@ -246,12 +246,12 @@ impl CodeWriter {
     // this function does following
     // declares the function label and initializes local variables
     pub fn write_function(&self, function_name: &str, no_of_args: u32) -> String {
-        let mut assembly_code = format!("// function {function_name} {no_of_args} \n");
+        let mut assembly_code = String::new();
         // add function label
-        assembly_code.push_str(&format!("({function_name})"));
+        assembly_code.push_str(&format!("({function_name})\n"));
         // push 0 no_of_arg times
         for _ in 0..no_of_args {
-            assembly_code.push_str(&format!("@0\nD=A\n@SP\nA=M\nM=D\n@SP\nM=M+1"));
+            assembly_code.push_str(&format!("@0\nD=A\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"));
         }
         assembly_code
     }
@@ -266,14 +266,14 @@ impl CodeWriter {
         let return_label = format!("{}$ret.{}", function_name, no_of_args);
         self.jump_label_id += 1;
 
-        let mut assembly_code = format!("// call {function_name} {no_of_args}\n");
+        let mut assembly_code = String::new();
         // push the return label on the stack
         assembly_code.push_str(&format!("@{return_label}\n"));
-        assembly_code.push_str(&format!("D=A\n@SP\nA=M\nM=D\n@SP\nM=M+1"));
+        assembly_code.push_str(&format!("D=A\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"));
 
         // save the callers frame : LCL, ARG, THIS, THAT
         for register in ["LCL", "ARG", "THIS", "THIS"] {
-            assembly_code.push_str(&format!("@{register}\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1"));
+            assembly_code.push_str(&format!("@{register}\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"));
         }
         // reposition ARG: ARG = SP - no_of_args - 5
         assembly_code.push_str(&format!("@SP\nD=M\n")); // ARG = SP

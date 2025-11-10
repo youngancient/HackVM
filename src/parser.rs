@@ -119,47 +119,71 @@ pub fn parse(instruction: String) -> CommandType {
     let elements = instruction.split(' ').collect::<Vec<&str>>();
     if elements.len() == 1 {
         // then the instruction is either Arithmetic or the instruction with just a single stuff
+        if elements[0] == "return" {
+            return CommandType::Return;
+        }
         return CommandType::Arithmetic {
             operation: Operation::from(elements[0]),
         };
     } else {
-        if elements[0] == "push" {
-            if let Ok(val) = elements[2].parse::<u32>() {
-                return CommandType::Push {
-                    segment: Segment::from(elements[1]),
-                    index: val,
-                };
-            } else {
-                panic!("{} is an invalid index", elements[2]);
+        // all commands with atleast one argument
+        match elements[0] {
+            "push" => {
+                if let Ok(val) = elements[2].parse::<u32>() {
+                    return CommandType::Push {
+                        segment: Segment::from(elements[1]),
+                        index: val,
+                    };
+                } else {
+                    panic!("{} is an invalid index", elements[2]);
+                }
             }
-        } else if elements[0] == "pop" {
-            if let Ok(val) = elements[2].parse::<u32>() {
-                return CommandType::Pop {
-                    segment: Segment::from(elements[1]),
-                    index: val,
-                };
-            } else {
-                panic!("{} is an invalid index", elements[2]);
+            "pop" => {
+                if let Ok(val) = elements[2].parse::<u32>() {
+                    return CommandType::Pop {
+                        segment: Segment::from(elements[1]),
+                        index: val,
+                    };
+                } else {
+                    panic!("{} is an invalid index", elements[2]);
+                }
             }
-        } else if elements[0] == "label" {
-            return CommandType::Label {
-                name: elements[1].to_string(),
-            };
-        } else if elements[0] == "if-goto" {
-            return CommandType::If {
-                label: elements[1].to_string(),
-            };
-        } else if elements[0] == "function" {
-            if let Ok(val) = elements[2].parse::<u32>() {
-                return CommandType::Function {
+            "label" => {
+                return CommandType::Label {
                     name: elements[1].to_string(),
-                    no_of_args: val,
                 };
-            } else {
-                panic!("{} is an invalid index", elements[2]);
             }
-        } else {
-            panic!("{} is an invalid command type", elements[0]);
+            "if-goto" => {
+                return CommandType::If {
+                    label: elements[1].to_string(),
+                };
+            }
+            "goto" => {
+                return CommandType::Goto {
+                    label: elements[1].to_string(),
+                };
+            }
+            "function" => {
+                if let Ok(val) = elements[2].parse::<u32>() {
+                    return CommandType::Function {
+                        name: elements[1].to_string(),
+                        no_of_args: val,
+                    };
+                } else {
+                    panic!("{} is an invalid number of arguments", elements[2]);
+                }
+            }
+            "call" => {
+                if let Ok(val) = elements[2].parse::<u32>() {
+                    return CommandType::Call {
+                        function_name: elements[1].to_string(),
+                        no_of_args: val,
+                    };
+                } else {
+                    panic!("{} is an invalid number of arguments", elements[2]);
+                }
+            }
+            _ => panic!("{} is an invalid command type", elements[0]),
         }
     }
 }

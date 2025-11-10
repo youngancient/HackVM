@@ -28,7 +28,7 @@ fn main() {
         let path = Path::new(arg);
         if path.is_file(){
             let file_name = extract_file_name(&arg);
-            println!("Assembling file : {}.vm",file_name);
+            println!("Translating file : {}.vm",file_name);
             let result = translate(&arg);
             match result {
                 Ok(_) => println!("Assembling successful ✅ Check output/{}.asm",file_name),
@@ -37,7 +37,7 @@ fn main() {
         } else if path.is_dir(){
             // handle directory 
             let dir_name = path.file_name().unwrap_or_default().to_string_lossy();
-            println!("Assembling directory: {}", dir_name);
+            println!("Translating directory: {}", dir_name);
             match translate_dir(arg) {
                 Ok(_) => println!("Directory assembly successful ✅ Check output/{}.asm", dir_name),
                 Err(err) => eprintln!("Failed to Assemble directory {}: {}",dir_name,err)

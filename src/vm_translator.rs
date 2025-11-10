@@ -41,8 +41,8 @@ pub fn translate(file_name_or_path: &str) -> io::Result<bool> {
     let mut code_writer = CodeWriter::new();
     code_writer.set_file_name(file_name.as_str());
     for line in lines {
-        let comment = format!("// {}", &line);
         if let Some(cleaned_line) = clean_line(&line) {
+            let comment = format!("// {}", &cleaned_line);  // translated code comment
             let command = parse(cleaned_line.to_string());
             let assembly_code = code_writer.command_to_assembly(command);
             output_vec.push(comment);
@@ -75,7 +75,7 @@ pub fn translate_dir(dir_name_or_path: &str) -> io::Result<bool> {
     let mut code_writer = CodeWriter::new();
 
     // add Bootstrapping code: intialize the stack and jump to sys.init
-    // output_vec.push(code_writer.write_init());
+    output_vec.push(code_writer.write_init());
 
     // read and sort .vm files to make sure that Sys.vm is read first
     let mut vm_files: Vec<PathBuf> = fs::read_dir(dir_path)?
@@ -111,8 +111,8 @@ pub fn translate_dir(dir_name_or_path: &str) -> io::Result<bool> {
         output_vec.push(format!("\n// --- Start of {} ---", current_vm_file_name));
 
         for line in lines {
-            let comment = format!("// {}", &line);
             if let Some(cleaned_line) = clean_line(&line) {
+                let comment = format!("// {}", &cleaned_line);      // translated code comment
                 let command = parse(cleaned_line.to_string());
                 let assembly_code = code_writer.command_to_assembly(command);
                 output_vec.push(comment);
@@ -145,6 +145,11 @@ mod tests {
 
     #[test]
     fn test_translate() {
-        let translate_1 = translate("./input/BasicTest.vm");
+        let translate = translate("./input/SimpleAdd.vm");
+    }
+
+    #[test]
+    fn test_translate_dir(){
+        let translate_dir = translate("./input/NestedCall");
     }
 }
