@@ -14,7 +14,7 @@ pub enum Segment {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Operation{
+pub enum Operation {
     Add,
     Sub,
     Neg,
@@ -23,10 +23,10 @@ pub enum Operation{
     Lt,
     And,
     Or,
-    Not
+    Not,
 }
-impl From<&str> for Operation  {
-    fn from(value : &str) -> Self{
+impl From<&str> for Operation {
+    fn from(value: &str) -> Self {
         match value {
             "add" => Operation::Add,
             "sub" => Operation::Sub,
@@ -37,21 +37,21 @@ impl From<&str> for Operation  {
             "not" => Operation::Not,
             "gt" => Operation::Gt,
             "lt" => Operation::Lt,
-            _ => panic!("{} is an invalid operation!",value)
+            _ => panic!("{} is an invalid operation!", value),
         }
     }
 }
 impl Segment {
-    pub fn asm_rep(&self) -> String{
+    pub fn asm_rep(&self) -> String {
         match self {
             Segment::Argument => "ARG".to_string(),
             Segment::Local => "LCL".to_string(),
             Segment::That => "THAT".to_string(),
             Segment::This => "THIS".to_string(),
-            _ => panic!("sorry no rep yet!")
+            _ => panic!("sorry no rep yet!"),
         }
     }
-    pub fn str_rep(&self) -> &str{
+    pub fn str_rep(&self) -> &str {
         match self {
             Segment::Argument => "argument",
             Segment::Local => "local",
@@ -60,7 +60,7 @@ impl Segment {
             Segment::Constant => "constant",
             Segment::Pointer => "pointer",
             Segment::Temp => "temp",
-            Segment::Static => "static"
+            Segment::Static => "static",
         }
     }
 }
@@ -83,15 +83,35 @@ impl From<&str> for Segment {
 
 #[derive(Debug, PartialEq)]
 pub enum CommandType {
-    Arithmetic { operation: Operation },
-    Push { segment: Segment, index: u32 },
-    Pop { segment: Segment, index: u32 },
-    Label,
-    Goto,
-    If,
-    Function,
+    Arithmetic {
+        operation: Operation,
+    },
+    Push {
+        segment: Segment,
+        index: u32,
+    },
+    Pop {
+        segment: Segment,
+        index: u32,
+    },
+    Label {
+        name: String,
+    },
+    Goto {
+        label: String,
+    },
+    If {
+        label: String,
+    },
+    Function {
+        name: String,
+        no_of_args: u32,
+    },
     Return,
-    Call,
+    Call {
+        function_name: String,
+        no_of_args: u32,
+    },
 }
 
 // takes an instruction as input, returns a command as output
@@ -99,34 +119,74 @@ pub fn parse(instruction: String) -> CommandType {
     let elements = instruction.split(' ').collect::<Vec<&str>>();
     if elements.len() == 1 {
         // then the instruction is either Arithmetic or the instruction with just a single stuff
+        if elements[0] == "return" {
+            return CommandType::Return;
+        }
         return CommandType::Arithmetic {
             operation: Operation::from(elements[0]),
         };
     } else {
-        if elements[0] == "push" {
-            if let Ok(val) = elements[2].parse::<u32>(){
-                return CommandType::Push {
-                    segment: Segment::from(elements[1]),
-                    index: val,
-                };
-            }else{
-                panic!("{} is an invalid index", elements[2]);
+        // all commands with atleast one argument
+        match elements[0] {
+            "push" => {
+                if let Ok(val) = elements[2].parse::<u32>() {
+                    return CommandType::Push {
+                        segment: Segment::from(elements[1]),
+                        index: val,
+                    };
+                } else {
+                    panic!("{} is an invalid index", elements[2]);
+                }
             }
-        } else if elements[0] == "pop" {
-            if let Ok(val) = elements[2].parse::<u32>(){
-                return CommandType::Pop {
-                    segment: Segment::from(elements[1]),
-                    index: val,
-                };
-            }else{
-                panic!("{} is an invalid index", elements[2]);
+            "pop" => {
+                if let Ok(val) = elements[2].parse::<u32>() {
+                    return CommandType::Pop {
+                        segment: Segment::from(elements[1]),
+                        index: val,
+                    };
+                } else {
+                    panic!("{} is an invalid index", elements[2]);
+                }
             }
-        } else {
-            panic!("{} is an invalid command type", elements[0]);
+            "label" => {
+                return CommandType::Label {
+                    name: elements[1].to_string(),
+                };
+            }
+            "if-goto" => {
+                return CommandType::If {
+                    label: elements[1].to_string(),
+                };
+            }
+            "goto" => {
+                return CommandType::Goto {
+                    label: elements[1].to_string(),
+                };
+            }
+            "function" => {
+                if let Ok(val) = elements[2].parse::<u32>() {
+                    return CommandType::Function {
+                        name: elements[1].to_string(),
+                        no_of_args: val,
+                    };
+                } else {
+                    panic!("{} is an invalid number of arguments", elements[2]);
+                }
+            }
+            "call" => {
+                if let Ok(val) = elements[2].parse::<u32>() {
+                    return CommandType::Call {
+                        function_name: elements[1].to_string(),
+                        no_of_args: val,
+                    };
+                } else {
+                    panic!("{} is an invalid number of arguments", elements[2]);
+                }
+            }
+            _ => panic!("{} is an invalid command type", elements[0]),
         }
     }
 }
-
 
 #[cfg(test)]
 
@@ -153,7 +213,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn test_parse_invalid_index(){
+    fn test_parse_invalid_index() {
         parse("pop constant d".to_string());
     }
 }
