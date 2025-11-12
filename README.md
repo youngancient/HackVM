@@ -20,7 +20,11 @@ cd HackVM
 cargo build --release
 ```
 ### 4. Run
-Pass one or more `.vm` files as arguments (Max 10 args)
+You can pass one or more `.vm` files (Max 10 files), or a single directory (containing Max 10 `.vm` files), as arguments.
+
+Option 1 : Pass One or More `.vm` Files.
+Use this option when you want to distinctively translate `.vm` files. The Output `.asm` files will be created in the `output/` directory which is automatically created if it does not exist.
+
 ```bash
 cargo run -- ./input/BasicTest.vm ./input/PointerTest.vm
 ```
@@ -35,4 +39,13 @@ If the input files are in the Root directory of this project, you can reference 
 cargo run -- BasicTest.vm PointerTest.vm
 ```
 
-The Output `.asm` files will be created in the `output/` directory which is automatically created if it does not exist.
+Option 2 : Pass a Directory 
+Use this option when you want a single translation for a number of `.vm` files. Say you have a directory `example_dir/` which contains `Sys.vm` and `Main.vm`. The output is a single `.asm` file created in the `output/` directory which is automatically created if it does not exist.
+
+```bash
+cargo run -- ./input/FibonacciElement ./input/FibonacciSeries
+```
+OR
+```bash
+cargo run -- "./input/FibonacciElement" "./input/FibonacciSeries"
+```
